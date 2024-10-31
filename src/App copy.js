@@ -60,25 +60,26 @@ function App() {
 
       setTodo(todoObj);
 
-      setTodoId(todoObj[todoObj.length-1].id);
-      //setTodoId(Math.max(...todoObj.map((item) => item.id)) + 1);
+      //setTodoId(todoObj[todoObj.length-1].id);
+      setTodoId(Math.max(...todoObj.map((item) => item.id)) + 1);
     }
   
   },[]); //useCallback함수로 getTodoList의 함수 결과가 변경되었는지 여부 알 수 있음
 
 
   //변경된 목록의 ID 조회하는 함수
-  let updateTodoId = useCallback( ()=>{
+  let updateTodoId = ()=>{
     console.log('updateTodoId 실행');
+    const todoStrFromLocalStorage = window.localStorage.getItem('todo');
 
-    //할일 리스트가 있으면
-    if(todo.length>0){
-      setTodoId(todo[todo.length-1].id);
-    }else{ //리스트 없으면
-      setTodoId(0);
+    if(todoStrFromLocalStorage !== null && todoStrFromLocalStorage !== '[]'){//값이 있으면
+      //JSON 문자열->객체 
+      const todoObj =  JSON.parse(todoStrFromLocalStorage);
+      //console.log(todoObj[todoObj.length-1].id); //마지막 인덱스 번호의 id값 조회
+      //setTodoId(todoObj[todoObj.length-1].id);
+      setTodoId(Math.max(...todoObj.map((item) => item.id)) + 1);
     }
-    
-  },[todo]);
+  }
 
 
   //로컬스토리지에 추가하는 함수
@@ -91,7 +92,6 @@ function App() {
     window.localStorage.setItem('todo',todoString);
   },[todo]);
 */
-
   //로컬스토리지에 추가하는 함수
   let setStorage = ()=>{
 
@@ -106,15 +106,11 @@ function App() {
   //로컬스토리지에서 todo key에 값이 있으면 > 조회 > todo에 목록으로 저장
   useEffect(()=>{
     getTodoList();
-  },[getTodoList])//뒤에 인수 빈 배열이면 최초 한번만 실행 > getTodoList 객체의 값이 변경되면 getTodoList 다시 실행
+  },[])//뒤에 인수 빈 배열이면 최초 한번만 실행 > getTodoList 객체의 값이 변경되면 getTodoList 다시 실행
 
   useEffect(()=>{
     setStorage();
   },[todo]) //최초 한번 실행, setStorage 변경되면 다시 실행
-
-  useEffect(()=>{
-    updateTodoId();
-  },[todo,updateTodoId]) //todo, updateTodoId 변경되면 TodoId 업데이트
 
 
 
@@ -124,11 +120,11 @@ function App() {
 
     let newTodos = [...todo];
 
-    let newId = todoId+1;
-    setTodoId(newId);
-    //const newId = Math.max(todoId, ...todo.map((item) => item.id + 1));
-    //setTodoId(newId + 1);
-
+    //let newId = todoId+1;
+    const newId = Math.max(todoId, ...todo.map((item) => item.id + 1));
+    setTodoId(newId + 1);
+    //setTodoId(newId);
+    
     newTodos.push({id:newId, text: value, checked: false});
     //기존거를 newTodos로 교체
     setTodo(newTodos);
@@ -137,9 +133,9 @@ function App() {
 
 
   //클릭했을때 체크박스 표시됨
-  let checkUpdate = (id, value)=>{
+  let todoUpdate = (id, value)=>{
 
-    console.log('checkUpdate 실행');
+    console.log('todoUpdate 실행');
     //console.log(id, value);
     //console.log(typeof(id)); //number
 
@@ -155,17 +151,13 @@ function App() {
     newTodos.splice(idx, 1);
     
     setTodo(newTodos);
+    updateTodoId();
     console.log(todoId);
   }
 
 
-  let updateTodo = (id,text)=>{
-    let newTodos = todo.map(item=> item.id === id ? {...item, text:text} : item);
-    setTodoId(newTodos);
-  }
-
   let todos = todo.map((item,idx)=>
-    <Todo data={item} key={idx} updateTodo={updateTodo} checkUpdate={checkUpdate} deleteTodo={deleteTodo} />
+    <Todo data={item} key={idx} todoUpdate={todoUpdate} deleteTodo={deleteTodo} />
   )
 
 
