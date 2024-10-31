@@ -82,7 +82,7 @@ function App() {
 
 
   //로컬스토리지에 추가하는 함수
-  /*
+
   let setStorage = useCallback(()=>{
 
     console.log('setStorage 실행');
@@ -90,8 +90,8 @@ function App() {
     let todoString = JSON.stringify(todo);
     window.localStorage.setItem('todo',todoString);
   },[todo]);
-*/
 
+/*
   //로컬스토리지에 추가하는 함수
   let setStorage = ()=>{
 
@@ -101,7 +101,7 @@ function App() {
     window.localStorage.setItem('todo',todoString);
   }
 
-
+*/
 
   //로컬스토리지에서 todo key에 값이 있으면 > 조회 > todo에 목록으로 저장
   useEffect(()=>{
@@ -110,7 +110,7 @@ function App() {
 
   useEffect(()=>{
     setStorage();
-  },[todo]) //최초 한번 실행, setStorage 변경되면 다시 실행
+  },[setStorage]) //최초 한번 실행, setStorage 변경되면 다시 실행
 
   useEffect(()=>{
     updateTodoId();
